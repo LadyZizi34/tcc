@@ -3,7 +3,7 @@ int serial_open(char* dev, int baudrate)
     int fd;
     struct termios options;
 
-    fd = open(dev, O_RDWR | O_NOCTTY /*| O_NDELAY*/);
+    fd = open(dev, O_RDWR | O_NOCTTY | O_NDELAY); //quase nao faz diferenca ser nao bloqueante
     if(fd < 0) {
         printf("Could not open device\n");
         return -1;
@@ -106,25 +106,22 @@ void wait_response(int fd, char* str, int tries)
         printf("AHRS did not respond to command.\n");
 }
 
-int read_protocol(int fd, char* ptcl, int tries, char* reading_buf, int buffersize)
+int read_protocol(int fd, char* ptcl, char* reading_buf, int buffersize)
 {
     char ptcl_name[15];    
     char *substr;
     int bytes_read;
     strcpy(ptcl_name, ptcl);
 
-    while(tries > 0) { 
-        //memset(reading_buf, 0, sizeof(reading_buf));
-        bytes_read = read(fd, reading_buf, buffersize);
-        substr = strstr(reading_buf, ptcl_name);
-        if(substr != NULL) {            
-            reading_buf[bytes_read] = 0;                           
-            return bytes_read;            
-        }
-        else tries--;
+    //memset(reading_buf, 0, sizeof(reading_buf));
+    bytes_read = read(fd, reading_buf, buffersize);
+    substr = strstr(reading_buf, ptcl_name);
+    if(substr != NULL) {            
+        reading_buf[bytes_read] = 0;                           
+        return bytes_read;            
     }
-    if(tries == 0){
-        printf("GPS did not send specified protocol.\n");
+    else {
+        //printf("Specified GPS protocol not available.\n");
         return -1;
     }
 }
