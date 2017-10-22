@@ -19,6 +19,7 @@ int serial_open(char* dev, int baudrate)
     options.c_cflag |= CS8;
     options.c_cflag |= baudrate | CRTSCTS; //new
     options.c_cc[VMIN] = 1; // min chars read
+    //options.c_cc[VMIN] = 0; // teste para saber serial.available -- fayou
     options.c_cc[VTIME] = 0;
     //options.c_iflag = IGNPAR | ICRNL;
     //options.c_oflag = 0;
@@ -102,5 +103,28 @@ void wait_response(int fd, char* str, int tries)
         else tries--;        
     }
     if(tries == 0)
-        printf("Device did not respond to command.\n");
+        printf("AHRS did not respond to command.\n");
+}
+
+int read_protocol(int fd, char* ptcl, int tries, char* reading_buf, int buffersize)
+{
+    char ptcl_name[15];    
+    char *substr;
+    int bytes_read;
+    strcpy(ptcl_name, ptcl);
+
+    while(tries > 0) { 
+        //memset(reading_buf, 0, sizeof(reading_buf));
+        bytes_read = read(fd, reading_buf, buffersize);
+        substr = strstr(reading_buf, ptcl_name);
+        if(substr != NULL) {            
+            reading_buf[bytes_read] = 0;                           
+            return bytes_read;            
+        }
+        else tries--;
+    }
+    if(tries == 0){
+        printf("GPS did not send specified protocol.\n");
+        return -1;
+    }
 }

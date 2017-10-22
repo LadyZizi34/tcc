@@ -51,12 +51,12 @@
                     will not terminate input)
           otherwise make device raw (no other input processing)
         */
-         newtio.c_iflag = IGNPAR | ICRNL;
+         //newtio.c_iflag = IGNPAR | ICRNL;
          
         /*
          Raw output.
         */
-         newtio.c_oflag = 0;
+         //newtio.c_oflag = 0;
          
         /*
           ICANON  : enable canonical input
@@ -106,7 +106,7 @@
             to the actual number of characters actually read */
             res = read(fd,buf,BUFFERSIZE); 
             buf[res]=0;             /* set end of string, so we can printf */
-            printf("(%d)%s", res, buf);
+            printf("%s", buf);
             if (buf[0]=='z') STOP=TRUE;
          }
          /* restore the old port settings */
